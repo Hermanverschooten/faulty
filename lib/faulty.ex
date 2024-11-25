@@ -15,7 +15,7 @@ defmodule Faulty do
   ## Integrations
 
   We currently include integrations for what we consider the basic stack of
-  an application: Phoenix, Plug, and Oban.
+  an application: Phoenix, Plug, Oban and Quantum.
 
   If you want to manually report an error, you can use the `Faulty.report/3` function.
 
@@ -37,7 +37,7 @@ defmodule Faulty do
   **Per process**
 
   This allows you to set a general context for the current process such as a Phoenix
-  request or an Oban job. For example, you could include the following code in your
+  request or an Quantum or Oban job. For example, you could include the following code in your
   authentication Plug to automatically include the user ID in any error that is
   tracked during the Phoenix request handling.
 
@@ -75,7 +75,7 @@ defmodule Faulty do
   context.
 
   Keep in mind that errors that occur in Phoenix controllers, Phoenix LiveViews
-  and Oban jobs are automatically reported. You will need this function only if you
+  and Quantum and Oban jobs are automatically reported. You will need this function only if you
   want to report custom errors.
 
   ```elixir

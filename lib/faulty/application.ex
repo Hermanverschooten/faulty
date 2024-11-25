@@ -16,6 +16,7 @@ defmodule Faulty.Application do
   end
 
   defp attach_handlers do
+    Faulty.Integrations.Quantum.attach()
     Faulty.Integrations.Oban.attach()
     Faulty.Integrations.Phoenix.attach()
   end
