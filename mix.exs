@@ -37,7 +37,8 @@ defmodule Faulty.MixProject do
       {:req, "~> 0.5"},
       {:plug, "~> 1.16"},
       {:ecto, "~> 3.11"},
-      {:ex_doc, "~> 0.34", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.34", only: :dev, runtime: false},
+      {:igniter, "~> 0.4"}
     ]
   end
 

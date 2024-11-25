@@ -23,8 +23,10 @@ defmodule Faulty.Application do
 
   defp set_url do
     if Application.get_env(:faulty, :enabled, false) do
-      if !Application.get_env(:faulty, :faulty_tower_url) do
-        raise ArgumentError, ":faulty_tower_url is not set in your config!"
+      envvar = Application.get_env(:faulty, :env, "FAULTY_TOWER_URL")
+
+      if !System.get_env(envvar) do
+        raise ArgumentError, "#{envvar} environment variable is not set!"
       end
     end
   end

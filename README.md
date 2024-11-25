@@ -20,6 +20,10 @@ def deps do
 end
 ```
 
+or you can also use `igniter` to add/install `Faulty`.
+
+`mix igniter.install faulty@github:Hermanverschooten/faulty`
+
 ## Configuration
 
 Add the following to your `config/config.exs` file:
@@ -28,14 +32,13 @@ Add the following to your `config/config.exs` file:
 config :faulty,
     otp_app: :your_app,
     enabled: true,
-    faulty_tower_url: "the url to this app in your faulty tower instance",
     retries: 5,
     connect_options: [...]
 ```
 
 The `:otp_app` option specifies your application, this allows `FaultyTower` to filter only your app's stack traces.
 
-The `:faulty_tower_url` should be filled in with the link to this app's project in your `FaultyTower` instance.
+The `:env` should be filled in with the name of the environment variable that contains the link to your FaultyTower instance, default is FAULTY_TOWER_URL.
 
 The `:enabled` option if not given, will default to `true`. You probable want to turn this off for your test environment.
 
