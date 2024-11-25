@@ -28,7 +28,7 @@ defmodule Mix.Tasks.Faulty.Install do
       # See the generators guide for more.
       group: :faulty,
       # dependencies to add
-      adds_deps: [{:faulty, github: "Hermanverschooten/faulty"}],
+      # adds_deps: [],
       # dependencies to add and call their associated installers, if they exist
       # installs: [],
       # An example invocation
