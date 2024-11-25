@@ -189,8 +189,15 @@ defmodule Faulty do
         {to_string(struct), Exception.message(ex)}
 
       other ->
-        {to_string(kind), to_string(other)}
+        {to_string(kind), safe_to_string(other)}
     end
+  end
+
+  defp safe_to_string(term) do
+    to_string(term)
+  rescue
+    Protocol.UndefinedError ->
+      inspect(Term)
   end
 
   defp bread_crumbs(exception) do
