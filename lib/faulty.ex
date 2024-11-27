@@ -17,7 +17,8 @@ defmodule Faulty do
   We currently include integrations for what we consider the basic stack of
   an application: Phoenix, Plug, Oban and Quantum.
 
-  If you want to manually report an error, you can use the `Faulty.report/3` function.
+  If you want to manually report an error, you can use the `Faulty.message/2` function.
+
 
   ## Context
 
@@ -47,8 +48,8 @@ defmodule Faulty do
 
   **Per call**
 
-  As we had seen before, you can use `Faulty.report/3` to manually report an
-  error. The third parameter of this function is optional and allows you to include
+  As we had seen before, you can use `Faulty.message/2` to manually report an
+  error. The second parameter of this function is optional and allows you to include
   extra context that will be tracked along with the error.
   """
 
@@ -67,7 +68,7 @@ defmodule Faulty do
   @doc """
   Report an exception to be stored.
 
-  Returns the occurrence stored or `:noop` if the Faulty is disabled by
+  Returns `:ok` stored or `:noop` if the Faulty is disabled by
   configuration the exception has not been stored.
 
   Aside from the exception, it is expected to receive the stack trace and,
@@ -89,7 +90,7 @@ defmodule Faulty do
 
   ## Exceptions
 
-  Exceptions can be passed in three different forms:
+  Exceptions can be passed as:
 
   * An exception struct: the module of the exception is stored along with
   the exception message.
@@ -118,6 +119,52 @@ defmodule Faulty do
       :noop
     end
   end
+
+  @doc """
+  Reports a message to be stored.
+
+  Returns `:ok` stored or `:noop` if the Faulty is disabled by
+  configuration the exception has not been stored.
+
+  This allows you to store a message or exception manually,
+  the stacktrace will be added automatically.
+
+  ```elixir
+  Faulty.message("Invalid user or password", %{login: login, password: password})
+
+  Faulty.message({ArgumentError, "Invalid user or password"}, %{login: login, password: password})
+  ```
+
+  ## Exceptions
+
+  Exceptions can be passed in three different forms:
+
+  * A binary: This will be stored as an `ErlangError`.
+
+  * An exception struct: the module of the exception is stored along with
+  the exception message.
+
+  * A `{kind, exception}` tuple in which case the information is converted to
+  an Elixir exception (if possible) and stored.
+
+  This function can also be used to test your setup.
+
+  """
+
+  @spec message(binary() | exception(), context()) :: :ok | :noop
+  def message(message, given_context \\ %{})
+
+  def message(message, given_context) when is_binary(message),
+    do: message({:error, message}, given_context)
+
+  def message(exception, given_context) when is_tuple(exception) or is_exception(exception) do
+    {:current_stacktrace, [_process_info, _self | stacktrace]} =
+      Process.info(self(), :current_stacktrace)
+
+    report(exception, stacktrace, given_context)
+  end
+
+  def message(_, _), do: :noop
 
   @doc """
   Sets the current process context.
