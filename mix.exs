@@ -2,12 +2,12 @@ defmodule Faulty.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/Hermanverschooten/faulty"
-  @version "0.1.0"
+  @version "0.1.1"
 
   def project do
     [
       app: :faulty,
-      version: "0.1.0",
+      version: @version,
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -38,7 +38,7 @@ defmodule Faulty.MixProject do
       {:plug, "~> 1.16"},
       {:ecto, "~> 3.11"},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
-      {:igniter, "~> 0.4"}
+      {:igniter, "~> 0.5", only: [:dev, :test]}
     ]
   end
 
