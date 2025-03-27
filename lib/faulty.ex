@@ -101,20 +101,25 @@ defmodule Faulty do
 
   @spec report(exception(), Exception.stacktrace(), context()) :: :ok | :noop
   def report(exception, stacktrace, given_context \\ %{}) do
-    {kind, reason} = normalize_exception(exception, stacktrace)
-    {:ok, stacktrace} = Faulty.Stacktrace.new(stacktrace)
-    {:ok, error} = Error.new(kind, reason, stacktrace)
-    context = Map.merge(get_context(), given_context)
+    if !Process.get(:faulty_error_reported) do
+      Process.put(:faulty_error_reported, true)
+      {kind, reason} = normalize_exception(exception, stacktrace)
+      {:ok, stacktrace} = Faulty.Stacktrace.new(stacktrace)
+      {:ok, error} = Error.new(kind, reason, stacktrace)
+      context = Map.merge(get_context(), given_context)
 
-    context =
-      if bread_crumbs = bread_crumbs(exception),
-        do: Map.put(context, "bread_crumbs", bread_crumbs),
-        else: context
+      context =
+        if bread_crumbs = bread_crumbs(exception),
+          do: Map.put(context, "bread_crumbs", bread_crumbs),
+          else: context
 
-    if enabled?() && !ignored?(error, context) do
-      sanitized_context = sanitize_context(context)
-      send_error!(error, stacktrace, sanitized_context, reason)
-      :ok
+      if enabled?() && !ignored?(error, context) do
+        sanitized_context = sanitize_context(context)
+        send_error!(error, stacktrace, sanitized_context, reason)
+        :ok
+      else
+        :noop
+      end
     else
       :noop
     end
