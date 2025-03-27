@@ -19,6 +19,7 @@ defmodule Faulty.Application do
     Faulty.Integrations.Quantum.attach()
     Faulty.Integrations.Oban.attach()
     Faulty.Integrations.Phoenix.attach()
+    Faulty.LoggerHandler.attach()
   end
 
   defp set_url do
