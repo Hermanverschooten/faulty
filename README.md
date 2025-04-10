@@ -2,7 +2,6 @@
 
 Error tracking for your application.
 
-<a title="GitHub CI" href="https://github.com/Hermanverschooten/error-tracker/actions"><img src="https://github.com/Hermanverschooten/error-tracker/workflows/CI/badge.svg" alt="GitHub CI" /></a>
 <a title="Latest release" href="https://hex.pm/packages/faulty"><img src="https://img.shields.io/hexpm/v/faulty.svg" alt="Latest release" /></a>
 <a title="View documentation" href="https://hexdocs.pm/faulty"><img src="https://img.shields.io/badge/hex.pm-docs-blue.svg" alt="View documentation" /></a>
 
@@ -15,14 +14,16 @@ Add `faulty` to your `mix.exs` file, then `mix deps.get` it.
 ```elixir
 def deps do
   [
-    {:faulty, "~> 0.1.0"}
+    {:faulty, "~> 0.1"}
   ]
 end
 ```
 
 or you can also use `igniter` to add/install `Faulty`.
 
-`mix igniter.install faulty@github:Hermanverschooten/faulty`
+```elixir
+mix igniter.install faulty`
+```
 
 ## Configuration
 
@@ -38,7 +39,7 @@ config :faulty,
 
 The `:otp_app` option specifies your application, this allows `FaultyTower` to filter only your app's stack traces.
 
-The `:env` should be filled in with the name of the environment variable that contains the link to your FaultyTower instance, default is FAULTY_TOWER_URL.
+The `:env` option should be filled in with the name of the environment variable that contains the link to your FaultyTower instance, default is FAULTY_TOWER_URL.
 
 The `:enabled` option if not given, will default to `true`. You probable want to turn this off for your test environment.
 
