@@ -2,6 +2,10 @@
 
 All notable changes will be recorded in this filed.
 
+## [v0.1.5](https://github.com/Hermanverschooten/faulty/compage/v0.1.4...v0.1.5) (2025-04-17)
+
+* Removed `Web` module, was a left-over from `ErrorTracker`.
+
 ## [v0.1.4](https://github.com/Hermanverschooten/faulty/compage/v0.1.3...v0.1.4) (2025-04-10)
 
 * Rewrote the igniter mix task to comply with the new style.

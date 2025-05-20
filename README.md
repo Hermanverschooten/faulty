@@ -113,3 +113,7 @@ Faulty tracks every error by default. In certain cases some errors may be expect
 Faulty provides functionality that allows you to ignore errors based on their attributes and context.
 
 Take a look at the `Faulty.Ignorer` behaviour for more information about how to implement your own ignorer.
+
+## Faulty Tower
+
+[Faulty Tower](https://github.com/Hermanverschooten/faulty_tower) is the accompanying website that hosts the error database.
