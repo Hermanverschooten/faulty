@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__FaultyTower__get_error_details",
+      "Bash(mix format)",
+      "Bash(mix test:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  }
+}

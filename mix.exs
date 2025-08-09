@@ -2,7 +2,7 @@ defmodule Faulty.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/Hermanverschooten/faulty"
-  @version "0.1.5"
+  @version "0.1.6"
 
   def project do
     [

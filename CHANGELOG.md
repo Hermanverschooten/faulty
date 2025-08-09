@@ -2,6 +2,28 @@
 
 All notable changes will be recorded in this filed.
 
+## [v0.1.6](https://github.com/Hermanverschooten/faulty/compare/v0.1.5...v0.1.6) (2025-08-09)
+
+### Added
+
+- Error fingerprinting system for intelligent error grouping and deduplication
+- Advanced error normalization for Erlang errors, TLS alerts, and Elixir exceptions
+- Comprehensive test suite with 55+ tests covering core functionality
+- Filter tests with examples for sanitizing passwords, credit cards, and emails
+- Ignorer tests with patterns for development, throttling, and user-specific filtering
+- Enhanced fingerprint generation with SHA256 hashing for consistent error identification
+
+### Changed
+
+- Improved error fingerprinting algorithm with better pattern recognition
+- Enhanced test infrastructure with proper setup/cleanup and configuration management
+- Updated dependencies
+
+### Fixed
+
+- Edge cases in fingerprint normalization for malformed error strings
+- Improved handling of nested context sanitization in filters
+
 ## [v0.1.5](https://github.com/Hermanverschooten/faulty/compage/v0.1.4...v0.1.5) (2025-04-17)
 
 * Removed `Web` module, was a left-over from `ErrorTracker`.

@@ -5,9 +5,9 @@ defmodule Faulty.Error do
   It stores a kind, reason and source code location to generate a unique
   fingerprint that can be used to avoid duplicates.
 
-  The fingerprint currently does not include the reason itself because it can
-  contain specific details that can change on the same error depending on
-  runtime conditions.
+  The fingerprint includes a normalized version of the error reason to ensure
+  proper grouping of similar errors while separating different error types.
+  See `Faulty.Fingerprint` for the fingerprinting algorithm details.
   """
 
   use Ecto.Schema
@@ -55,12 +55,13 @@ defmodule Faulty.Error do
       source_function: source_function
     ]
 
-    fingerprint = :crypto.hash(:sha256, params |> Keyword.values() |> Enum.join())
+    fingerprint =
+      Faulty.Fingerprint.generate(to_string(kind), reason, source_line, source_function)
 
     %__MODULE__{}
     |> Ecto.Changeset.change(params)
     |> Ecto.Changeset.put_change(:reason, reason)
-    |> Ecto.Changeset.put_change(:fingerprint, Base.encode16(fingerprint))
+    |> Ecto.Changeset.put_change(:fingerprint, fingerprint)
     |> Ecto.Changeset.put_change(:last_occurrence_at, DateTime.utc_now())
     |> Ecto.Changeset.apply_action(:new)
   end
