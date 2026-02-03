@@ -2,6 +2,16 @@
 
 All notable changes will be recorded in this filed.
 
+## [v0.1.7](https://github.com/Hermanverschooten/faulty/compare/v0.1.6...v0.1.7) (2026-02-03)
+
+### Changed
+
+- Updated ecto 3.13.2 → 3.13.5
+- Updated ex_doc 0.38.2 → 0.40.1
+- Updated igniter 0.6.25 → 0.7.2
+- Updated plug 1.18.1 → 1.19.1
+- Updated req 0.5.15 → 0.5.17
+
 ## [v0.1.6](https://github.com/Hermanverschooten/faulty/compare/v0.1.5...v0.1.6) (2025-08-09)
 
 ### Added
