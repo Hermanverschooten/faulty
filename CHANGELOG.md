@@ -2,6 +2,16 @@
 
 All notable changes will be recorded in this filed.
 
+## [v0.1.8](https://github.com/Hermanverschooten/faulty/compare/v0.1.7...v0.1.8) (2026-06-13)
+
+### Changed
+
+- Updated dependencies: ecto 3.13.5 → 3.14.0, req 0.5.17 → 0.6.1, plug 1.19.1 → 1.19.2, ex_doc 0.40.1 → 0.40.3, igniter 0.7.2 → 0.8.1, finch 0.21.0 → 0.22.0, mint 1.7.1 → 1.9.0, decimal 2.3.0 → 3.1.1, telemetry 1.3.0 → 1.4.2, and other transitive deps
+
+### Fixed
+
+- Resolved compiler warnings under Elixir 1.20 / OTP 29 (unused `require Logger`, unreachable filter test clauses)
+
 ## [v0.1.7](https://github.com/Hermanverschooten/faulty/compare/v0.1.6...v0.1.7) (2026-02-03)
 
 ### Changed
