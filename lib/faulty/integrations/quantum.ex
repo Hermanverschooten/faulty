@@ -13,8 +13,6 @@ defmodule Faulty.Integrations.Quantum do
   on your application.
   """
 
-  require Logger
-
   @events [
     [:quantum, :job, :start],
     [:quantum, :job, :exception]

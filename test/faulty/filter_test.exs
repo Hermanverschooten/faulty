@@ -155,8 +155,6 @@ defmodule Faulty.FilterTest do
           value
         end
       end
-
-      defp sanitize_cc_number(value), do: value
     end
 
     test "filters credit card numbers" do
@@ -206,8 +204,6 @@ defmodule Faulty.FilterTest do
           value
         end
       end
-
-      defp sanitize_email_value(value), do: value
     end
 
     test "filters email addresses" do

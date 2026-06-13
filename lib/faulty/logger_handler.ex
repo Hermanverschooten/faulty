@@ -5,8 +5,6 @@ defmodule Faulty.LoggerHandler do
 
   @own_logs_domain [:faulty, :logger_handler]
 
-  require Logger
-
   @spec attach() :: :ok | {:error, term()}
   def attach do
     :logger.add_handler(
