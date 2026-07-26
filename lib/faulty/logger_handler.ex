@@ -55,7 +55,6 @@ defmodule Faulty.LoggerHandler do
   defp handle_log_event(%{level: :error, meta: %{crash_reason: {exception, stacktrace}}})
        when is_exception(exception) and is_list(stacktrace) do
     Faulty.report(exception, stacktrace)
-    |> dbg()
   end
 
   defp handle_log_event(%{level: :error, meta: %{crash_reason: {{:nocatch, reason}, stacktrace}}})

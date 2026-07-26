@@ -2,6 +2,22 @@
 
 All notable changes will be recorded in this filed.
 
+## [v0.1.9](https://github.com/Hermanverschooten/faulty/compare/v0.1.8...v0.1.9) (2026-07-26)
+
+### Fixed
+
+- Removed a stray `dbg()` call in `Faulty.LoggerHandler` that printed debug output to stdout every time an exception was reported. Present since v0.1.3.
+
+### Security
+
+- Updated `mint` 1.9.0 → 1.9.3, addressing CVE-2026-59249 (HTTP/1 chunk-size request smuggling), CVE-2026-58229 (unbounded response header size) and CVE-2026-59246 (empty HTTP/2 CONTINUATION frames)
+- Updated `hpax` 1.0.3 → 1.0.4, addressing CVE-2026-58226 (unbounded HPACK integer decoding DoS)
+- Updated `plug` 1.19.2 → 1.20.3, addressing CVE-2026-56814 (multipart parts not counted towards the length limit) and CVE-2026-56813 (semicolon injection in cookie attributes)
+
+### Changed
+
+- Updated dependencies: req 0.6.1 → 0.6.3, plug 1.19.2 → 1.20.3, ecto 3.14.0 → 3.14.1, igniter 0.8.1 → 0.8.3, finch 0.22.0 → 0.23.0, mint 1.9.0 → 1.9.3, hpax 1.0.3 → 1.0.4, plug_crypto 2.1.1 → 2.2.0, sourceror 1.12.0 → 1.12.2, ex_ast 0.12.0 → 0.13.1, glob_ex 0.1.11 → 0.1.12, makeup 1.2.1 → 1.2.2, earmark_parser 1.4.44 → 1.4.46
+
 ## [v0.1.8](https://github.com/Hermanverschooten/faulty/compare/v0.1.7...v0.1.8) (2026-06-13)
 
 ### Changed
