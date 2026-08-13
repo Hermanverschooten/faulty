@@ -24,3 +24,6 @@ faulty-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# Claude Code local config and generated agents/commands/skills
+.claude/
