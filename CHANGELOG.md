@@ -2,6 +2,16 @@
 
 All notable changes will be recorded in this filed.
 
+## [v0.1.10](https://github.com/Hermanverschooten/faulty/compare/v0.1.9...v0.1.10) (2026-09-08)
+
+### Security
+
+- Updated `mint` 1.9.3 → 1.10.0, addressing CVE-2026-82728 (HTTP/1 status-line/chunk-extension memory-exhaustion DoS) and CVE-2026-82729 (chunked response chunk-size CPU-exhaustion DoS)
+
+### Changed
+
+- Updated dependencies: req 0.6.3 → 0.7.4, ecto 3.14.1 → 3.14.2, ex_doc 0.40.3 → 0.40.4, igniter 0.8.3 → 0.8.4, mint 1.9.3 → 1.10.0, spitfire 0.3.13 → 0.4.1
+
 ## [v0.1.9](https://github.com/Hermanverschooten/faulty/compare/v0.1.8...v0.1.9) (2026-07-26)
 
 ### Fixed
