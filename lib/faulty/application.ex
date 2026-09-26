@@ -3,8 +3,11 @@ defmodule Faulty.Application do
 
   use Application
 
+  @impl true
   def start(_type, _args) do
     set_url()
+    Faulty.Http.warn_about_ignored_config()
+    Faulty.Http.start_profile()
 
     children =
       [{Task.Supervisor, name: Faulty.TaskSupervisor}, Faulty.Reporter] ++
@@ -14,6 +17,9 @@ defmodule Faulty.Application do
 
     Supervisor.start_link(children, strategy: :one_for_one, name: __MODULE__)
   end
+
+  @impl true
+  def stop(_state), do: Faulty.Http.stop_profile()
 
   defp attach_handlers do
     Faulty.Integrations.Quantum.attach()

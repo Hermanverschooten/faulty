@@ -50,10 +50,10 @@ mix faulty.install         # Custom mix task to install Faulty in a project
 ## Development Notes
 
 - **Requires Elixir 1.17+**
-- **Dependencies**: Uses `Req` for HTTP requests and `Jason` for JSON. `Plug` is optional and only needed for the Plug and Phoenix integrations. `Faulty.Error` and `Faulty.Stacktrace` are plain structs, there is no Ecto dependency
+- **Dependencies**: Uses Erlang's built-in `:httpc` for HTTP requests (through `Faulty.Http`) and `Jason` for JSON. `Plug` is optional and only needed for the Plug and Phoenix integrations. `Faulty.Error` and `Faulty.Stacktrace` are plain structs, there is no Ecto dependency
 - **Error Tracking**: Automatically tracks errors in Phoenix controllers, LiveViews, and Oban jobs via telemetry
 - **Context System**: Supports per-process and per-call context for error enrichment
-- **Configuration**: Configured via Application environment with keys like `:enabled`, `:retries`, `:connect_options`
+- **Configuration**: Configured via Application environment with keys like `:enabled`, `:queue_size`, `:retry_interval`, `:connect_options`
 - **Faulty Tower Integration**: Sends errors to accompanying Faulty Tower service for visualization
 
 ## Key Features

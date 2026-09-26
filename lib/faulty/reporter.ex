@@ -99,26 +99,15 @@ defmodule Faulty.Reporter do
   end
 
   defp post(url, error) do
-    options =
-      Keyword.merge(
-        [
-          json: error,
-          connect_options: Application.get_env(:faulty, :connect_options, []),
-          retry: :transient,
-          max_retries: Application.get_env(:faulty, :retries, 5)
-        ],
-        Application.get_env(:faulty, :req_options, [])
-      )
-
-    case Req.post(url, options) do
-      {:ok, %{status: status}} when status in 200..299 ->
+    case Faulty.Http.post(url, Jason.encode!(error)) do
+      {:ok, status} when status in 200..299 ->
         Logger.debug("Faulty: Error sent")
         :ok
 
-      {:ok, %{status: status}} when status in [408, 429] or status >= 500 ->
+      {:ok, status} when status in [408, 429] or status >= 500 ->
         :retry
 
-      {:ok, %{status: status}} ->
+      {:ok, status} ->
         Logger.debug("Faulty: Error rejected with status #{status}, dropping")
         :drop
 
