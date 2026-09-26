@@ -27,6 +27,8 @@ defmodule Faulty.Integrations.Quantum do
   def handle_event([:quantum, :job, :start], _measurements, metadata, :no_config) do
     %{job: job} = metadata
 
+    Faulty.clear_reported()
+
     Faulty.set_context(%{
       "node" => inspect(metadata.node),
       "scheduler" => inspect(metadata.scheduler),

@@ -61,6 +61,8 @@ defmodule Faulty.Integrations.Oban do
   def handle_event([:oban, :job, :start], _measurements, metadata, :no_config) do
     %{job: job} = metadata
 
+    Faulty.clear_reported()
+
     Faulty.set_context(%{
       "job.args" => job.args,
       "job.attempt" => job.attempt,

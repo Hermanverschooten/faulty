@@ -90,12 +90,16 @@ defmodule Faulty.Integrations.Phoenix do
   end
 
   def handle_event([:phoenix, :live_view, :mount, :start], _, metadata, :no_config) do
+    Faulty.clear_reported()
+
     Faulty.set_context(%{
       "live_view.view" => metadata.socket.view
     })
   end
 
   def handle_event([:phoenix, :live_view, :handle_params, :start], _, metadata, :no_config) do
+    Faulty.clear_reported()
+
     Faulty.set_context(%{
       "live_view.uri" => metadata.uri,
       "live_view.params" => metadata.params
