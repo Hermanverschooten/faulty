@@ -10,6 +10,8 @@ All notable changes will be recorded in this filed.
 
 ### Changed
 
+- Removed the `ecto` (and its `decimal`) dependency: `Faulty.Error` and `Faulty.Stacktrace` are now plain structs with the same fields and the same JSON shape, `Faulty.Error.new/3` and `Faulty.Stacktrace.new/1` still return `{:ok, struct}`. `jason` and `telemetry` are now explicit dependencies, they were already pulled in indirectly.
+- `plug` is now an optional dependency. The `Faulty.Integrations.Plug` and `Faulty.Integrations.Phoenix` integrations are only compiled when Plug is available, which it always is in a Phoenix application.
 - The error context is now scrubbed by default: the value under a sensitive key (`password`, `token`, `secret`, `authorization`, `x-api-key`, `cookie`, ...) is replaced by `"[FILTERED]"` before your `Faulty.Filter` runs. See `Faulty.Scrubber`. Set `config :faulty, scrub_pii: false` to turn it off.
 - Errors are now sent from a supervised `Task`, one at a time, so a slow or unreachable FaultyTower no longer blocks the reporter.
 - The queue of errors waiting to be sent is limited by the new `:queue_size` option (default 1000). New errors are dropped while it is full.

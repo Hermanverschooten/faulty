@@ -18,8 +18,15 @@ defmodule Faulty.Application do
   defp attach_handlers do
     Faulty.Integrations.Quantum.attach()
     Faulty.Integrations.Oban.attach()
-    Faulty.Integrations.Phoenix.attach()
+
+    attach_phoenix()
     Faulty.LoggerHandler.attach()
+  end
+
+  if Code.ensure_loaded?(Plug.Conn) do
+    defp attach_phoenix, do: Faulty.Integrations.Phoenix.attach()
+  else
+    defp attach_phoenix, do: :ok
   end
 
   defp set_url do

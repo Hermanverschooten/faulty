@@ -4,51 +4,55 @@ defmodule Faulty.Stacktrace do
   occurrence of an exception.
   """
 
-  use Ecto.Schema
+  defmodule Line do
+    @moduledoc """
+    A single entry of a `Faulty.Stacktrace`.
+    """
 
-  @type t :: %__MODULE__{}
+    @type t :: %__MODULE__{
+            application: String.t() | nil,
+            module: String.t() | nil,
+            function: String.t() | nil,
+            arity: non_neg_integer() | nil,
+            file: String.t() | nil,
+            line: non_neg_integer() | nil
+          }
+
+    @derive {Jason.Encoder, only: [:application, :module, :function, :arity, :file, :line]}
+
+    defstruct [:application, :module, :function, :arity, :file, :line]
+  end
+
+  @type t :: %__MODULE__{lines: [Line.t()]}
 
   @derive {Jason.Encoder, only: [:lines]}
 
-  @primary_key false
-  embedded_schema do
-    embeds_many :lines, Line, primary_key: false do
-      @derive {Jason.Encoder, only: [:application, :module, :function, :arity, :file, :line]}
-      field(:application, :string)
-      field(:module, :string)
-      field(:function, :string)
-      field(:arity, :integer)
-      field(:file, :string)
-      field(:line, :integer)
-    end
-  end
+  defstruct lines: []
 
+  @spec new(Exception.stacktrace()) :: {:ok, t()}
   def new(stack) do
-    lines_params =
+    lines =
       for {module, function, arity, opts} <- stack do
         application = Application.get_application(module)
 
-        %{
-          application: to_string(application),
+        %Line{
+          application: blank_to_nil(to_string(application)),
           module: module |> to_string() |> String.replace_prefix("Elixir.", ""),
           function: to_string(function),
           arity: normalize_arity(arity),
-          file: to_string(opts[:file]),
+          file: blank_to_nil(to_string(opts[:file])),
           line: opts[:line]
         }
       end
 
-    %__MODULE__{}
-    |> Ecto.Changeset.cast(%{lines: lines_params}, [])
-    |> Ecto.Changeset.cast_embed(:lines, with: &line_changeset/2)
-    |> Ecto.Changeset.apply_action(:new)
+    {:ok, %__MODULE__{lines: lines}}
   end
 
   defp normalize_arity(a) when is_integer(a), do: a
   defp normalize_arity(a) when is_list(a), do: length(a)
 
-  defp line_changeset(line = %__MODULE__.Line{}, params) do
-    Ecto.Changeset.cast(line, params, ~w[application module function arity file line]a)
+  defp blank_to_nil(string) do
+    if String.trim(string) == "", do: nil, else: string
   end
 
   @doc """
