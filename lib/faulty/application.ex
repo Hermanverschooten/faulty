@@ -7,7 +7,7 @@ defmodule Faulty.Application do
     set_url()
 
     children =
-      [Faulty.Reporter] ++
+      [{Task.Supervisor, name: Faulty.TaskSupervisor}, Faulty.Reporter] ++
         Application.get_env(:faulty, :plugins, [])
 
     attach_handlers()

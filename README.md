@@ -34,6 +34,8 @@ config :faulty,
     otp_app: :your_app,
     enabled: true,
     retries: 5,
+    queue_size: 1000,
+    retry_interval: :timer.minutes(1),
     connect_options: [...]
 ```
 
@@ -43,9 +45,13 @@ The `:env` option should be filled in with the name of the environment variable 
 
 The `:enabled` option if not given, will default to `true`. You probable want to turn this off for your test environment.
 
-The `:retries` option is used to tell `Req` how many times to retry sending the error to `FaultyTower`, defaults to 5. If it hasn't succeeded by then the error will be dropped.
+The `:retries` option is used to tell `Req` how many times to retry a single request to `FaultyTower`, defaults to 5.
 
-The `:connect_options` are passed through to `Req`.
+Errors are queued and sent one at a time, in the order they were reported, without blocking your application. If `FaultyTower` cannot be reached, or answers with a `408`, `429` or `5xx` status, the error stays at the head of the queue and is tried again after `:retry_interval` milliseconds, defaults to one minute. Any other response, such as a `422`, means the error will never be accepted and it is dropped, so it can't hold up the errors queued behind it.
+
+The `:queue_size` option limits how many errors wait to be sent, defaults to 1000. Once the queue is full new errors are dropped until there is room again, so an outage of `FaultyTower` can't make your application use more and more memory.
+
+The `:connect_options` are passed through to `Req`, as are any `:req_options`.
 
 ## Error tracking
 
