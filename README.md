@@ -35,6 +35,7 @@ config :faulty,
     enabled: true,
     retries: 5,
     queue_size: 1000,
+    scrub_pii: true,
     retry_interval: :timer.minutes(1),
     connect_options: [...]
 ```
@@ -50,6 +51,8 @@ The `:retries` option is used to tell `Req` how many times to retry a single req
 Errors are queued and sent one at a time, in the order they were reported, without blocking your application. If `FaultyTower` cannot be reached, or answers with a `408`, `429` or `5xx` status, the error stays at the head of the queue and is tried again after `:retry_interval` milliseconds, defaults to one minute. Any other response, such as a `422`, means the error will never be accepted and it is dropped, so it can't hold up the errors queued behind it.
 
 The `:queue_size` option limits how many errors wait to be sent, defaults to 1000. Once the queue is full new errors are dropped until there is room again, so an outage of `FaultyTower` can't make your application use more and more memory.
+
+The `:scrub_pii` option, defaults to `true`, replaces the value of every sensitive key in the error context with `"[FILTERED]"` before it is sent. This covers request headers and params, Oban job args, LiveView event params and anything you add with `Faulty.set_context/1`. Keys such as `password`, `token`, `secret`, `authorization`, `x-api-key` and `cookie` are matched, ignoring case and separators, see `Faulty.Scrubber` for the full list. Only keys are checked, error messages are not touched. Set it to `false` to turn it off, your own `Faulty.Filter` runs afterwards either way.
 
 The `:connect_options` are passed through to `Req`, as are any `:req_options`.
 

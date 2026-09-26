@@ -10,6 +10,7 @@ All notable changes will be recorded in this filed.
 
 ### Changed
 
+- The error context is now scrubbed by default: the value under a sensitive key (`password`, `token`, `secret`, `authorization`, `x-api-key`, `cookie`, ...) is replaced by `"[FILTERED]"` before your `Faulty.Filter` runs. See `Faulty.Scrubber`. Set `config :faulty, scrub_pii: false` to turn it off.
 - Errors are now sent from a supervised `Task`, one at a time, so a slow or unreachable FaultyTower no longer blocks the reporter.
 - The queue of errors waiting to be sent is limited by the new `:queue_size` option (default 1000). New errors are dropped while it is full.
 - Only network errors and `408`, `429` and `5xx` responses are retried, after `:retry_interval` (default one minute). Any other non-2xx response drops the error instead of blocking the queue behind it forever.
