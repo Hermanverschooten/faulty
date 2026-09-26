@@ -2,7 +2,7 @@
 
 All notable changes will be recorded in this filed.
 
-## Unreleased
+## [v0.2.0](https://github.com/Hermanverschooten/faulty/compare/v0.1.10...v0.2.0) (2026-09-26)
 
 ### Added
 

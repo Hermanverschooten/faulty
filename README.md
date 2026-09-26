@@ -14,7 +14,7 @@ Add `faulty` to your `mix.exs` file, then `mix deps.get` it.
 ```elixir
 def deps do
   [
-    {:faulty, "~> 0.1"}
+    {:faulty, "~> 0.2"}
   ]
 end
 ```
