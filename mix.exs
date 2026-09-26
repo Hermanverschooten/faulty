@@ -38,7 +38,7 @@ defmodule Faulty.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:jason, "~> 1.0"},
+      {:jason, "~> 1.0", optional: true},
       {:plug, "~> 1.16", optional: true},
       {:telemetry, "~> 0.4 or ~> 1.0"},
       {:bandit, "~> 1.0", only: :test},

@@ -1,6 +1,10 @@
 defmodule Faulty.ReporterTest do
   use ExUnit.Case
 
+  defmodule MarkingJson do
+    def encode!(term), do: term |> Map.put("encoded_by", "marking") |> Jason.encode!()
+  end
+
   alias Faulty.Reporter
   alias Faulty.TestServer
 
@@ -8,7 +12,7 @@ defmodule Faulty.ReporterTest do
     original_url = System.get_env("FAULTY_TOWER_URL")
 
     original_env =
-      for key <- [:queue_size, :retry_interval, :connect_options, :receive_timeout],
+      for key <- [:queue_size, :retry_interval, :connect_options, :receive_timeout, :json_library],
           do: {key, Application.get_env(:faulty, key)}
 
     Application.put_env(:faulty, :retry_interval, 10)
@@ -88,6 +92,84 @@ defmodule Faulty.ReporterTest do
       wait_until_empty()
       refute_received {:request, _, _}
       assert Process.whereis(Reporter) == reporter
+    end
+  end
+
+  describe "payload" do
+    for library <- [JSON, Jason] do
+      test "has the shape FaultyTower expects, encoded with #{inspect(library)}" do
+        Application.put_env(:faulty, :json_library, unquote(library))
+        serve(fn _body -> 200 end)
+
+        {:ok, stacktrace} =
+          Faulty.Stacktrace.new([{Faulty, :report, 3, [file: ~c"lib/faulty.ex", line: 10]}])
+
+        {:ok, error} = Faulty.Error.new("Elixir.ArgumentError", "boom", stacktrace)
+        Reporter.send(error, stacktrace, %{"user_id" => 1, "tags" => ["a", "b"]}, "boom")
+
+        assert_receive {:request, _, body}
+        payload = Jason.decode!(body)
+
+        assert payload |> Map.keys() |> Enum.sort() == ~w(context error reason stacktrace)
+        assert payload["reason"] == "boom"
+        assert payload["context"] == %{"user_id" => 1, "tags" => ["a", "b"]}
+
+        assert payload["error"] |> Map.keys() |> Enum.sort() ==
+                 ~w(fingerprint kind last_occurrence_at reason source_function source_line status)
+
+        assert payload["error"]["kind"] == "Elixir.ArgumentError"
+        assert payload["error"]["status"] == "unresolved"
+        assert payload["error"]["fingerprint"] == error.fingerprint
+        assert {:ok, _, _} = DateTime.from_iso8601(payload["error"]["last_occurrence_at"])
+
+        assert payload["stacktrace"] == %{
+                 "lines" => [
+                   %{
+                     "application" => "faulty",
+                     "module" => "Faulty",
+                     "function" => "report",
+                     "arity" => 3,
+                     "file" => "lib/faulty.ex",
+                     "line" => 10
+                   }
+                 ]
+               }
+
+        wait_until_empty()
+      end
+    end
+
+    test "uses the configured json library" do
+      Application.put_env(:faulty, :json_library, Faulty.ReporterTest.MarkingJson)
+      serve(fn _body -> 200 end)
+
+      enqueue("marked")
+
+      assert_receive {:request, _, body}
+      assert Jason.decode!(body)["encoded_by"] == "marking"
+      wait_until_empty()
+    end
+
+    @tag :capture_log
+    test "drops an error whose context cannot be encoded without blocking the next one" do
+      serve(fn _body -> 200 end)
+      {:ok, stacktrace} = Faulty.Stacktrace.new([])
+      {:ok, error} = Faulty.Error.new("error", "unencodable", stacktrace)
+
+      log =
+        ExUnit.CaptureLog.capture_log([level: :warning], fn ->
+          Reporter.send(error, stacktrace, %{"pid" => self()}, "unencodable")
+          wait_until_empty()
+        end)
+
+      assert log =~ "could not encode"
+      refute_received {:request, _, _}
+
+      enqueue("fine")
+
+      assert_receive {:request, _, body}
+      assert body =~ "fine"
+      wait_until_empty()
     end
   end
 

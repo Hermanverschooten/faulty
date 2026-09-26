@@ -18,14 +18,10 @@ defmodule Faulty.Stacktrace do
             line: non_neg_integer() | nil
           }
 
-    @derive {Jason.Encoder, only: [:application, :module, :function, :arity, :file, :line]}
-
     defstruct [:application, :module, :function, :arity, :file, :line]
   end
 
   @type t :: %__MODULE__{lines: [Line.t()]}
-
-  @derive {Jason.Encoder, only: [:lines]}
 
   defstruct lines: []
 

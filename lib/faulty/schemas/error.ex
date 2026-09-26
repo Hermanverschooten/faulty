@@ -22,17 +22,6 @@ defmodule Faulty.Error do
           last_occurrence_at: DateTime.t() | nil
         }
 
-  @derive {Jason.Encoder,
-           only: [
-             :kind,
-             :reason,
-             :source_line,
-             :source_function,
-             :status,
-             :fingerprint,
-             :last_occurrence_at
-           ]}
-
   defstruct kind: nil,
             reason: nil,
             source_line: nil,

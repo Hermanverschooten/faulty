@@ -10,7 +10,10 @@ All notable changes will be recorded in this filed.
 
 ### Changed
 
-- Removed the `ecto` (and its `decimal`) dependency: `Faulty.Error` and `Faulty.Stacktrace` are now plain structs with the same fields and the same JSON shape, `Faulty.Error.new/3` and `Faulty.Stacktrace.new/1` still return `{:ok, struct}`. `jason` and `telemetry` are now explicit dependencies, they were already pulled in indirectly.
+- The JSON library is now configurable with `:json_library` and defaults to the `JSON` module that is part of Elixir 1.18+. Any module that exports `encode!/1` works. `jason` is now an optional dependency: on Elixir 1.17 add it and set `config :faulty, json_library: Jason`, `mix faulty.install` does this for you. The library is checked when Faulty starts.
+- Errors are sent as plain data, `Faulty.Error`, `Faulty.Stacktrace` and its lines no longer implement `Jason.Encoder`. The JSON that is sent is unchanged. Values in the error context must be encodable by the configured library (`@derive JSON.Encoder` instead of `@derive Jason.Encoder` for your own structs on the built-in `JSON`).
+- An error whose context cannot be encoded is dropped with a warning in your logs, instead of silently.
+- Removed the `ecto` (and its `decimal`) dependency: `Faulty.Error` and `Faulty.Stacktrace` are now plain structs with the same fields and the same JSON shape, `Faulty.Error.new/3` and `Faulty.Stacktrace.new/1` still return `{:ok, struct}`. `telemetry` is now an explicit dependency, it was already pulled in indirectly.
 - `plug` is now an optional dependency. The `Faulty.Integrations.Plug` and `Faulty.Integrations.Phoenix` integrations are only compiled when Plug is available, which it always is in a Phoenix application.
 - The error context is now scrubbed by default: the value under a sensitive key (`password`, `token`, `secret`, `authorization`, `x-api-key`, `cookie`, ...) is replaced by `"[FILTERED]"` before your `Faulty.Filter` runs. See `Faulty.Scrubber`. Set `config :faulty, scrub_pii: false` to turn it off.
 - Errors are now sent from a supervised `Task`, one at a time, so a slow or unreachable FaultyTower no longer blocks the reporter.
