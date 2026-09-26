@@ -10,9 +10,17 @@ defmodule Faulty.Error do
   See `Faulty.Fingerprint` for the fingerprinting algorithm details.
   """
 
-  use Ecto.Schema
+  @type status :: :resolved | :unresolved
 
-  @type t :: %__MODULE__{}
+  @type t :: %__MODULE__{
+          kind: String.t() | nil,
+          reason: String.t() | nil,
+          source_line: String.t() | nil,
+          source_function: String.t() | nil,
+          status: status(),
+          fingerprint: String.t() | nil,
+          last_occurrence_at: DateTime.t() | nil
+        }
 
   @derive {Jason.Encoder,
            only: [
@@ -25,17 +33,16 @@ defmodule Faulty.Error do
              :last_occurrence_at
            ]}
 
-  schema "faulty_errors" do
-    field(:kind, :string)
-    field(:reason, :string)
-    field(:source_line, :string)
-    field(:source_function, :string)
-    field(:status, Ecto.Enum, values: [:resolved, :unresolved], default: :unresolved)
-    field(:fingerprint, :binary)
-    field(:last_occurrence_at, :utc_datetime_usec)
-  end
+  defstruct kind: nil,
+            reason: nil,
+            source_line: nil,
+            source_function: nil,
+            status: :unresolved,
+            fingerprint: nil,
+            last_occurrence_at: nil
 
   @doc false
+  @spec new(term(), String.t(), Faulty.Stacktrace.t()) :: {:ok, t()}
   def new(kind, reason, stacktrace = %Faulty.Stacktrace{}) do
     source = Faulty.Stacktrace.source(stacktrace)
 
@@ -49,21 +56,17 @@ defmodule Faulty.Error do
         {"-", "-"}
       end
 
-    params = [
-      kind: to_string(kind),
-      source_line: source_line,
-      source_function: source_function
-    ]
+    kind = to_string(kind)
 
-    fingerprint =
-      Faulty.Fingerprint.generate(to_string(kind), reason, source_line, source_function)
-
-    %__MODULE__{}
-    |> Ecto.Changeset.change(params)
-    |> Ecto.Changeset.put_change(:reason, reason)
-    |> Ecto.Changeset.put_change(:fingerprint, fingerprint)
-    |> Ecto.Changeset.put_change(:last_occurrence_at, DateTime.utc_now())
-    |> Ecto.Changeset.apply_action(:new)
+    {:ok,
+     %__MODULE__{
+       kind: kind,
+       reason: reason,
+       source_line: source_line,
+       source_function: source_function,
+       fingerprint: Faulty.Fingerprint.generate(kind, reason, source_line, source_function),
+       last_occurrence_at: DateTime.utc_now()
+     }}
   end
 
   @doc """

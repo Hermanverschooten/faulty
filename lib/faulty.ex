@@ -10,12 +10,15 @@ defmodule Faulty do
 
   ## Requirements
 
-  Faulty requires Elixir 1.15+
+  Faulty requires Elixir 1.17+
 
   ## Integrations
 
   We currently include integrations for what we consider the basic stack of
   an application: Phoenix, Plug, Oban and Quantum.
+
+  The Phoenix and Plug integrations are only available when `:plug` is one of
+  your dependencies, which it always is in a Phoenix application.
 
   If you want to manually report an error, you can use the `Faulty.message/2` function.
 

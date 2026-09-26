@@ -35,8 +35,9 @@ defmodule Faulty.MixProject do
   defp deps do
     [
       {:req, "~> 0.5"},
-      {:plug, "~> 1.16"},
-      {:ecto, "~> 3.11"},
+      {:jason, "~> 1.0"},
+      {:plug, "~> 1.16", optional: true},
+      {:telemetry, "~> 0.4 or ~> 1.0"},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
       {:igniter, "~> 0.5", optional: true}
     ]
