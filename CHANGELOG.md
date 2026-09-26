@@ -17,7 +17,11 @@ All notable changes will be recorded in this filed.
 - The queue of errors waiting to be sent is limited by the new `:queue_size` option (default 1000). New errors are dropped while it is full.
 - Only network errors and `408`, `429` and `5xx` responses are retried, after `:retry_interval` (default one minute). Any other non-2xx response drops the error instead of blocking the queue behind it forever.
 - The FaultyTower url is read when an error is sent, and an error is dropped when it is not set, instead of crashing the reporter.
-- Any `:req_options` are passed to `Req` when sending an error.
+- **Breaking:** errors are now sent with Erlang's built-in `:httpc` and `Req` is no longer a dependency, which removes `req`, `finch`, `mint`, `hpax`, `nimble_pool`, `nimble_options` and `mime` from your dependency tree. The certificate of FaultyTower is still verified against your system's CA certificates.
+- `:connect_options` keeps working for the keys `:transport_opts` (the `:ssl` options, so the `transport_opts: [verify: :verify_none]` that `mix faulty.install` writes to `dev.exs` still works), `:timeout` (the connect timeout) and `:proxy` (`{:http, host, port, []}`). Other keys are ignored and a warning is logged at startup.
+- **Breaking:** the `:retries` and `:req_options` options are no longer used, a warning is logged at startup when they are set. Failed errors are retried by the queue, see `:retry_interval`.
+- New `:receive_timeout` option, the longest a single request may take, defaults to 15 seconds.
+- A request that fails because the `:httpc` process is not available is retried instead of dropped.
 
 ### Fixed
 

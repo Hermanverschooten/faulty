@@ -10,6 +10,7 @@ defmodule Faulty.MixProject do
       version: @version,
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
 
       # Hex
@@ -27,17 +28,20 @@ defmodule Faulty.MixProject do
   def application do
     [
       mod: {Faulty.Application, []},
-      extra_applications: [:logger]
+      extra_applications: [:logger, :inets, :ssl, :public_key, :crypto]
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_env), do: ["lib"]
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:req, "~> 0.5"},
       {:jason, "~> 1.0"},
       {:plug, "~> 1.16", optional: true},
       {:telemetry, "~> 0.4 or ~> 1.0"},
+      {:bandit, "~> 1.0", only: :test},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
       {:igniter, "~> 0.5", optional: true}
     ]
