@@ -6,7 +6,7 @@ defmodule Mix.Tasks.Faulty.Install.Docs do
   end
 
   def example do
-    "mix faulty.install --env_var TOWERURL"
+    "mix faulty.install --env-var TOWERURL"
   end
 
   def long_doc do
@@ -21,7 +21,7 @@ defmodule Mix.Tasks.Faulty.Install.Docs do
 
     ## Options
 
-    * `--env_var` - The environment variable that holds your faulty tower url, defaults to: FAULTY_TOWER_URL
+    * `--env-var` - The environment variable that holds your faulty tower url, defaults to: FAULTY_TOWER_URL
     """
   end
 end
