@@ -253,10 +253,15 @@ defmodule Faulty do
 
   defp sanitize_context(context) do
     filter_mod = Application.get_env(:faulty, :filter)
+    context = if scrub_pii?(), do: Faulty.Scrubber.scrub(context), else: context
 
     if filter_mod,
       do: filter_mod.sanitize(context),
       else: context
+  end
+
+  defp scrub_pii? do
+    !!Application.get_env(:faulty, :scrub_pii, true)
   end
 
   defp normalize_exception(%struct{} = ex, _stacktrace) when is_exception(ex) do

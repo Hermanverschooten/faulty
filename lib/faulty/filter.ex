@@ -15,6 +15,9 @@ defmodule Faulty.Filter do
 
     config :faulty, filter: MyApp.Filter
 
+  The context has already been scrubbed of sensitive values by `Faulty.Scrubber`
+  when the filter is called, unless you set `config :faulty, scrub_pii: false`.
+
   With this configuration in place, the Faulty will call `MyApp.Filter.sanitize/1` to get a context before
   saving error occurrence.
 

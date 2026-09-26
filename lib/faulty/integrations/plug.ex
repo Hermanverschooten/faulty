@@ -57,7 +57,8 @@ defmodule Faulty.Integrations.Plug do
 
   * `request.headers`: headers received on the request. All headers are included
   by default except for the `Cookie` ones, as they may include large and
-  sensitive content like sessions.
+  sensitive content like sessions. Sensitive headers such as `Authorization` and
+  `X-Api-Key` have their value replaced, see `Faulty.Scrubber`.
 
   """
 
