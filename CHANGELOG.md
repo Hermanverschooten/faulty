@@ -8,6 +8,14 @@ All notable changes will be recorded in this filed.
 
 - `Faulty.clear_reported/0` to reset the duplicate-report guard of the current process, for long-lived processes such as a `GenServer` that rescue and report errors.
 
+### Changed
+
+- Errors are now sent from a supervised `Task`, one at a time, so a slow or unreachable FaultyTower no longer blocks the reporter.
+- The queue of errors waiting to be sent is limited by the new `:queue_size` option (default 1000). New errors are dropped while it is full.
+- Only network errors and `408`, `429` and `5xx` responses are retried, after `:retry_interval` (default one minute). Any other non-2xx response drops the error instead of blocking the queue behind it forever.
+- The FaultyTower url is read when an error is sent, and an error is dropped when it is not set, instead of crashing the reporter.
+- Any `:req_options` are passed to `Req` when sending an error.
+
 ### Fixed
 
 - A process no longer stops reporting after its first error: the duplicate-report guard is now cleared at the start of every Phoenix request, LiveView mount and `handle_params`, Oban job and Quantum job.
