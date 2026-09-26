@@ -21,6 +21,7 @@ All notable changes will be recorded in this filed.
 
 ### Fixed
 
+- `Faulty.Stacktrace.source/1` now finds the first stack line that belongs to your `:otp_app`. It compared the application name (a string) with the configured atom, so it never matched and always returned the first line, usually library code. The source line and function of new errors, which are part of their fingerprint, now point at your own code. **Errors reported from a stack that starts in library code will get a new fingerprint and show up as new groups in FaultyTower.**
 - A process no longer stops reporting after its first error: the duplicate-report guard is now cleared at the start of every Phoenix request, LiveView mount and `handle_params`, Oban job and Quantum job.
 - The Plug integration's own per-process guard is cleared the same way, so a keep-alive connection process reports more than its first router exception.
 - Errors that are a term without a `String.Chars` implementation (for example `throw(%{code: 42})`) are now stored with `inspect/1` of the term instead of the literal `"Term"`.
