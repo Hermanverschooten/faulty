@@ -10,7 +10,9 @@ defmodule Faulty do
 
   ## Requirements
 
-  Faulty requires Elixir 1.17+
+  Faulty requires Elixir 1.17+. Errors are sent as JSON with the built-in `JSON`
+  module, which needs Elixir 1.18+. On Elixir 1.17, add `:jason` to your
+  dependencies and set `config :faulty, json_library: Jason`.
 
   ## Integrations
 
@@ -218,14 +220,16 @@ defmodule Faulty do
 
   ## Content serialization
 
-  The content stored on the context should be serializable using the JSON library
-  used by the application (usually `Jason`), so it is rather recommended to use
-  primitive types (strings, numbers, booleans...).
+  The content stored on the context must be serializable by the JSON library that
+  Faulty is configured to use (`:json_library`, the built-in `JSON` module by
+  default), so it is rather recommended to use primitive types (strings, numbers,
+  booleans...).
 
   If you still need to pass more complex data types to your context, please test
-  that they can be encoded to JSON or storing the errors will fail. In the case
-  of `Jason` that may require defining an Encoder for that data type if not
-  included by default.
+  that they can be encoded to JSON or the error will be dropped, with a warning in
+  your logs. That may require defining an encoder for that data type if not
+  included by default: `@derive JSON.Encoder` with the built-in `JSON` module,
+  or `@derive Jason.Encoder` with `Jason`.
   """
   @spec set_context(context()) :: context()
   def set_context(params) when is_map(params) do

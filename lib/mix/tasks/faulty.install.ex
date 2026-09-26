@@ -84,6 +84,7 @@ if Code.ensure_loaded?(Igniter) do
         end
 
       igniter
+      |> add_json_library(Code.ensure_loaded?(JSON))
       |> Igniter.Project.Config.configure(
         "dev.exs",
         :faulty,
@@ -114,6 +115,15 @@ if Code.ensure_loaded?(Igniter) do
         [:enabled],
         true
       )
+    end
+
+    @doc false
+    def add_json_library(igniter, true), do: igniter
+
+    def add_json_library(igniter, false) do
+      igniter
+      |> Igniter.Project.Deps.add_dep({:jason, "~> 1.0"})
+      |> Igniter.Project.Config.configure("config.exs", :faulty, [:json_library], Jason)
     end
   end
 else

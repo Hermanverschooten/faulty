@@ -71,22 +71,22 @@ defmodule Faulty.Reporter do
         state
 
       id ->
-        [{^id, error}] = :ets.lookup(state.errors, id)
+        [{^id, report}] = :ets.lookup(state.errors, id)
         Logger.debug("Faulty: Processing first error in queue.")
 
-        task = Task.Supervisor.async_nolink(Faulty.TaskSupervisor, fn -> deliver(error) end)
+        task = Task.Supervisor.async_nolink(Faulty.TaskSupervisor, fn -> deliver(report) end)
         %{state | delivering: {task.ref, id}}
     end
   end
 
-  defp deliver(error) do
+  defp deliver(report) do
     case get_url() do
       nil ->
         Logger.debug("Faulty: No url configured, dropping error")
         :drop
 
       url ->
-        post(url, error)
+        post(url, report)
     end
   rescue
     exception ->
@@ -98,8 +98,26 @@ defmodule Faulty.Reporter do
       :drop
   end
 
-  defp post(url, error) do
-    case Faulty.Http.post(url, Jason.encode!(error)) do
+  defp post(url, report) do
+    case encode(report) do
+      {:ok, body} -> send_body(url, body)
+      :error -> :drop
+    end
+  end
+
+  defp encode(report) do
+    {:ok, report |> Faulty.Payload.build() |> Faulty.Json.encode!()}
+  rescue
+    exception ->
+      Logger.warning(
+        "Faulty: could not encode the error as JSON, dropping it: #{Exception.message(exception)}"
+      )
+
+      :error
+  end
+
+  defp send_body(url, body) do
+    case Faulty.Http.post(url, body) do
       {:ok, status} when status in 200..299 ->
         Logger.debug("Faulty: Error sent")
         :ok

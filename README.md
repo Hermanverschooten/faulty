@@ -36,6 +36,7 @@ config :faulty,
     queue_size: 1000,
     scrub_pii: true,
     retry_interval: :timer.minutes(1),
+    json_library: JSON,
     connect_options: [...]
 ```
 
@@ -50,6 +51,8 @@ Errors are queued and sent one at a time, in the order they were reported, witho
 The `:queue_size` option limits how many errors wait to be sent, defaults to 1000. Once the queue is full new errors are dropped until there is room again, so an outage of `FaultyTower` can't make your application use more and more memory.
 
 The `:scrub_pii` option, defaults to `true`, replaces the value of every sensitive key in the error context with `"[FILTERED]"` before it is sent. This covers request headers and params, Oban job args, LiveView event params and anything you add with `Faulty.set_context/1`. Keys such as `password`, `token`, `secret`, `authorization`, `x-api-key` and `cookie` are matched, ignoring case and separators, see `Faulty.Scrubber` for the full list. Only keys are checked, error messages are not touched. Set it to `false` to turn it off, your own `Faulty.Filter` runs afterwards either way.
+
+The `:json_library` option is the module used to encode errors as JSON, defaults to the `JSON` module that is part of Elixir 1.18+. Any module that exports `encode!/1` works, such as `Jason`. On Elixir 1.17 there is no `JSON` module, add `{:jason, "~> 1.0"}` to your dependencies and set `json_library: Jason`, `mix faulty.install` does this for you. Faulty checks the library when it starts. Values in the error context must be encodable by it.
 
 Errors are sent with Erlang's built-in `:httpc`, so `Faulty` has no HTTP client dependency. The certificate of your `FaultyTower` is verified against your system's CA certificates.
 

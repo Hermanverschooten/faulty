@@ -39,10 +39,17 @@ defmodule Faulty.SchemasTest do
       assert {:ok, %Stacktrace{lines: []}} = Stacktrace.new([])
     end
 
-    test "encodes to json with only the lines and their fields" do
+    test "is sent as plain data with only the lines and their fields" do
       {:ok, stacktrace} = Stacktrace.new(@stack)
+      {:ok, error} = Error.new("error", "boom", stacktrace)
 
-      assert %{"lines" => [first | _]} = stacktrace |> Jason.encode!() |> Jason.decode!()
+      assert %{"stacktrace" => %{"lines" => [first | _]}} =
+               Faulty.Payload.build(%{
+                 error: error,
+                 stacktrace: stacktrace,
+                 context: %{},
+                 reason: "boom"
+               })
 
       assert first == %{
                "application" => "faulty",
@@ -135,11 +142,17 @@ defmodule Faulty.SchemasTest do
       assert {error.source_line, error.source_function} == {"-", "-"}
     end
 
-    test "encodes to json with exactly the fields FaultyTower expects" do
+    test "is sent as plain data with exactly the fields FaultyTower expects" do
       {:ok, stacktrace} = Stacktrace.new(@stack)
       {:ok, error} = Error.new("Elixir.ArgumentError", "boom", stacktrace)
 
-      json = error |> Jason.encode!() |> Jason.decode!()
+      %{"error" => json} =
+        Faulty.Payload.build(%{
+          error: error,
+          stacktrace: stacktrace,
+          context: %{},
+          reason: "boom"
+        })
 
       assert Map.keys(json) |> Enum.sort() ==
                ~w(fingerprint kind last_occurrence_at reason source_function source_line status)

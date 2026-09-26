@@ -6,6 +6,7 @@ defmodule Faulty.Application do
   @impl true
   def start(_type, _args) do
     set_url()
+    validate_json_library()
     Faulty.Http.warn_about_ignored_config()
     Faulty.Http.start_profile()
 
@@ -33,6 +34,10 @@ defmodule Faulty.Application do
     defp attach_phoenix, do: Faulty.Integrations.Phoenix.attach()
   else
     defp attach_phoenix, do: :ok
+  end
+
+  defp validate_json_library do
+    if Application.get_env(:faulty, :enabled, false), do: Faulty.Json.validate!()
   end
 
   defp set_url do
