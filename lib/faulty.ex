@@ -126,6 +126,34 @@ defmodule Faulty do
   end
 
   @doc """
+  Clears the duplicate-report guard of the current process.
+
+  A process reports only one error until this is called, so that the same crash
+  is not stored twice when it is seen by more than one integration (for example
+  a Phoenix telemetry event and the `:logger` handler).
+
+  The integrations call this for you at the start of every Phoenix request,
+  LiveView mount and `handle_params`, Oban job and Quantum job. Call it yourself
+  at the start of each unit of work in a long-lived process that rescues and
+  reports errors, such as a `GenServer`:
+
+  ```elixir
+  def handle_info(:tick, state) do
+    Faulty.clear_reported()
+    do_work(state)
+  rescue
+    e -> Faulty.report(e, __STACKTRACE__)
+  end
+  ```
+  """
+  @spec clear_reported() :: :ok
+  def clear_reported do
+    Process.delete(:faulty_error_reported)
+    Process.delete(:faulty_router_exception_reported)
+    :ok
+  end
+
+  @doc """
   Reports a message to be stored.
 
   Returns `:ok` stored or `:noop` if the Faulty is disabled by
@@ -249,7 +277,7 @@ defmodule Faulty do
     to_string(term)
   rescue
     Protocol.UndefinedError ->
-      inspect(Term)
+      inspect(term)
   end
 
   defp bread_crumbs(exception) do

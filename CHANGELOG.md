@@ -2,6 +2,18 @@
 
 All notable changes will be recorded in this filed.
 
+## Unreleased
+
+### Added
+
+- `Faulty.clear_reported/0` to reset the duplicate-report guard of the current process, for long-lived processes such as a `GenServer` that rescue and report errors.
+
+### Fixed
+
+- A process no longer stops reporting after its first error: the duplicate-report guard is now cleared at the start of every Phoenix request, LiveView mount and `handle_params`, Oban job and Quantum job.
+- The Plug integration's own per-process guard is cleared the same way, so a keep-alive connection process reports more than its first router exception.
+- Errors that are a term without a `String.Chars` implementation (for example `throw(%{code: 42})`) are now stored with `inspect/1` of the term instead of the literal `"Term"`.
+
 ## [v0.1.10](https://github.com/Hermanverschooten/faulty/compare/v0.1.9...v0.1.10) (2026-09-08)
 
 ### Security

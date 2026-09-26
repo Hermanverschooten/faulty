@@ -108,6 +108,7 @@ defmodule Faulty.Integrations.Plug do
 
   @doc false
   def set_context(conn = %Plug.Conn{}) do
+    Faulty.clear_reported()
     conn |> build_context |> Faulty.set_context()
   end
 

@@ -174,6 +174,26 @@ defmodule FaultyTest do
     end
   end
 
+  describe "reason normalization" do
+    defmodule CapturingIgnorer do
+      @behaviour Faulty.Ignorer
+
+      def ignore?(error, _context) do
+        send(self(), {:captured, error})
+        true
+      end
+    end
+
+    test "keeps the payload of a thrown term that has no String.Chars implementation" do
+      Application.put_env(:faulty, :ignorer, CapturingIgnorer)
+
+      assert report_error(fn -> throw(%{code: 42}) end) == :noop
+
+      assert_received {:captured, %Faulty.Error{kind: "throw", reason: reason}}
+      assert reason == inspect(%{code: 42})
+    end
+  end
+
   defp report_error(fun, context \\ %{}) do
     try do
       fun.()
