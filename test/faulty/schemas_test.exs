@@ -61,6 +61,43 @@ defmodule Faulty.SchemasTest do
     end
   end
 
+  describe "Faulty.Stacktrace.source/1" do
+    @library_first [
+      {Enum, :map, 2, [file: ~c"lib/enum.ex", line: 1]},
+      {Faulty, :report, 3, [file: ~c"lib/faulty.ex", line: 10]},
+      {Plug, :call, 2, [file: ~c"lib/plug.ex", line: 5]}
+    ]
+
+    test "picks the first line that belongs to the client application" do
+      {:ok, stacktrace} = Stacktrace.new(@library_first)
+
+      assert %Stacktrace.Line{module: "Faulty", function: "report"} =
+               Stacktrace.source(stacktrace)
+    end
+
+    test "accepts the client application as a string" do
+      original = Application.fetch_env!(:faulty, :otp_app)
+      Application.put_env(:faulty, :otp_app, "faulty")
+      on_exit(fn -> Application.put_env(:faulty, :otp_app, original) end)
+
+      {:ok, stacktrace} = Stacktrace.new(@library_first)
+
+      assert %Stacktrace.Line{module: "Faulty"} = Stacktrace.source(stacktrace)
+    end
+
+    test "falls back to the first line when none belongs to the client application" do
+      {:ok, stacktrace} = Stacktrace.new([hd(@library_first), List.last(@library_first)])
+
+      assert %Stacktrace.Line{module: "Enum"} = Stacktrace.source(stacktrace)
+    end
+
+    test "returns nil for an empty stacktrace" do
+      {:ok, stacktrace} = Stacktrace.new([])
+
+      assert Stacktrace.source(stacktrace) == nil
+    end
+  end
+
   describe "Faulty.Error.new/3" do
     test "builds an unresolved error with a fingerprint and timestamp" do
       {:ok, stacktrace} = Stacktrace.new(@stack)
@@ -74,6 +111,19 @@ defmodule Faulty.SchemasTest do
       assert error.status == :unresolved
       assert is_binary(error.fingerprint)
       assert %DateTime{} = error.last_occurrence_at
+    end
+
+    test "takes the source from the client application, not from library code" do
+      {:ok, stacktrace} =
+        Stacktrace.new([
+          {Enum, :map, 2, [file: ~c"lib/enum.ex", line: 1]},
+          {Faulty, :report, 3, [file: ~c"lib/faulty.ex", line: 10]}
+        ])
+
+      {:ok, error} = Error.new("error", "boom", stacktrace)
+
+      assert error.source_line == "lib/faulty.ex:10"
+      assert error.source_function == "Faulty.report/3"
     end
 
     test "has no source information without a stacktrace" do
